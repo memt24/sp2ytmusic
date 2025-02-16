@@ -35,7 +35,6 @@ REDIRECT_URI = os.getenv("REDIRECT_URI", "http://localhost:8888/callback")
 
 yt_client_id = os.getenv("YT_CLIENT_ID")
 yt_client_secret = os.getenv("YT_CLIENT_SECRET")
-YT_REDIRECT_URI = os.getenv("YT_REDIRECT_URI", "http://localhost:8888/yt_callback")
 YT_AUTH_URL = "https://accounts.google.com/o/oauth2/auth"
 YT_TOKEN_URL = "https://oauth2.googleapis.com/token"
 
