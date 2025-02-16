@@ -7,8 +7,12 @@ from flask import Flask, request, session, redirect, url_for, jsonify
 from flask_session import Session
 import base64
 from datetime import datetime, timedelta
-from ytmusicapi import YTMusic, OAuthCredentials
+from ytmusicapi.setup import main
 import dotenv
+import sys
+import argparse
+
+
 
 # Load environment variables from .env file
 dotenv.load_dotenv()
@@ -24,12 +28,13 @@ AUTH_URL = 'https://accounts.spotify.com/authorize'
 TOKEN_URL = 'https://accounts.spotify.com/api/token'
 API_BASE_URL = 'https://api.spotify.com/v1'
 
-CLIENT_ID = os.getenv("CLIENT_ID")
-CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+client_id = os.getenv("CLIENT_ID")
+client_secret = os.getenv("CLIENT_SECRET")
 REDIRECT_URI = os.getenv("REDIRECT_URI", "http://localhost:8888/callback")
 
-YT_CLIENT_ID = os.getenv("YT_CLIENT_ID")
-YT_CLIENT_SECRET = os.getenv("YT_CLIENT_SECRET")
+
+yt_client_id = os.getenv("YT_CLIENT_ID")
+yt_client_secret = os.getenv("YT_CLIENT_SECRET")
 YT_REDIRECT_URI = os.getenv("YT_REDIRECT_URI", "http://localhost:8888/yt_callback")
 YT_AUTH_URL = "https://accounts.google.com/o/oauth2/auth"
 YT_TOKEN_URL = "https://oauth2.googleapis.com/token"
@@ -45,7 +50,7 @@ def home():
 @app.route('/login', methods=['GET'])
 def login():
     params = {
-        'client_id': CLIENT_ID,
+        'client_id': client_id,
         'response_type': 'code',
         'redirect_uri': REDIRECT_URI,
         'scope': scope,
@@ -70,7 +75,7 @@ def callback():
 
     # Create Basic Authorization header
     auth_header = base64.b64encode(
-        f"{CLIENT_ID}:{CLIENT_SECRET}".encode()
+        f"{client_id}:{client_secret}".encode()
     ).decode()
 
     headers = {
@@ -314,8 +319,8 @@ def create_playlists():
     ytmusic = YTMusic(
         'oauth.json',
         oauth_credentials=OAuthCredentials(
-            client_id=YT_CLIENT_ID,
-            client_secret=YT_CLIENT_SECRET
+            client_id=yt_client_id,
+            client_secret=yt_client_secret
         )
     )
 
@@ -372,4 +377,27 @@ def create_playlists():
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("execute", help="Type 'execute' to run ytmusicapi oauth")
+    args = parser.parse_args()
+    
+    try:
+        if args.execute == "execute":
+            # If credentials are not set via environment variables, prompt the user.
+            if not yt_client_id or not yt_client_secret:
+                yt_client_id = input("Enter your Google Youtube API client ID: ")
+                yt_client_secret = input("Enter your Google Youtube API client secret: ")
+            
+            # Simulate CLI arguments for the OAuth setup
+            sys.argv = [
+                'setup.py', 'oauth',
+                '--client-id', yt_client_id,
+                '--client-secret', yt_client_secret
+            ]
+            main()
+        else:
+            raise Exception("Invalid argument")
+    except Exception as e:
+        print(e)
+
     app.run(host='localhost', port=8888, debug=True)
