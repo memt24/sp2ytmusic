@@ -58,7 +58,7 @@ This project is a Flask-based web application that transfers your playlists from
 
 ### 1. YouTube Music OAuth Setup
 
-Before starting the Flask application, you may need to run the OAuth setup for YouTube Music. This process uses your environment variables (or prompts for them if they are missing). Run the following command:
+Before starting the Flask application, you may need to run the OAuth setup for YouTube Music(You can check the ytmusicapi's documentation). This process uses your environment variables (or prompts for them if they are missing). Run the following command:
 
 ```bash
 python api.py execute
@@ -109,3 +109,13 @@ Open your browser and navigate to [http://localhost:8888/](http://localhost:8888
 
 Contributions are welcome! Feel free to open issues or submit pull requests if you have suggestions or improvements.
 
+
+## Why did I use ytmusicapi ? 
+
+This project was initially developed using the official YouTube Data API v3. However, this API has a daily quota limit of 10,000 units, which is very restrictive. For example, searching for a video and retrieving its ID to add it to a playlist consumes 100 units per operation. Given that I have around 6,500 songs in my playlists, this limitation made it impossible to complete the task without requesting a quota increase.
+
+To overcome this issue, I switched to ytmusicapi, a reverse-engineered web API that uses unofficial endpoints. While it is not officially supported by YouTube, it functions perfectly for my use case. I am unsure about its exact quota limits, but they appear to be significantly higher than those of the official API.
+
+Interestingly, this quota issue did not arise when fetching songs and playlists from Spotify, as they seem to have a much higher quota limit than YouTube.
+
+If anyone has insights regarding quota usage for the YouTube Data API, I would greatly appreciate your help!
